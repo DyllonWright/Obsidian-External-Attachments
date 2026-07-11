@@ -1,0 +1,5 @@
+/* Subtle dashed outline on embeds that resolved from an external folder. */
+.external-attachment-indicator {
+	outline: 1px dashed rgba(120, 180, 120, 0.4);
+	outline-offset: 2px;
+}

@@ -1,0 +1,20 @@
+{
+	"name": "external-attachments",
+	"version": "1.0.0",
+	"description": "Obsidian plugin: resolve attachment embeds from folders outside the vault — offload heavy files to external drives or extra cloud storage while wikilinks keep rendering.",
+	"main": "main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"test": "node test/run.mjs"
+	},
+	"keywords": ["obsidian", "obsidian-plugin", "attachments"],
+	"author": "Dyllon Wright",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^20.14.0",
+		"esbuild": "^0.24.0",
+		"obsidian": "latest",
+		"typescript": "^5.6.0"
+	}
+}

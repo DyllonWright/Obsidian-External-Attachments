@@ -1,0 +1,10 @@
+{
+	"id": "external-attachments",
+	"name": "External Attachments",
+	"version": "1.0.0",
+	"minAppVersion": "1.0.0",
+	"description": "Resolve attachment embeds from folders outside the vault — offload heavy files to external drives or extra cloud storage while wikilinks keep rendering.",
+	"author": "Dyllon Wright",
+	"authorUrl": "https://github.com/DyllonWright",
+	"isDesktopOnly": true
+}
