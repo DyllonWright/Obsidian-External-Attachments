@@ -4,7 +4,7 @@ import {
 	AUDIO_EXT, IMG_EXT, PDF_EXT, VIDEO_EXT,
 	MountResolver, linkpathOf, mimeFor
 } from "./resolver";
-import { DEFAULT_SETTINGS, ExternalAttachmentsSettingTab, ExternalAttachmentsSettings, migrateSettings } from "./settings";
+import { ExternalAttachmentsSettingTab, ExternalAttachmentsSettings, migrateSettings } from "./settings";
 
 interface EmbedContext {
 	sourcePath: string;
@@ -35,7 +35,7 @@ export default class ExternalAttachmentsPlugin extends Plugin {
 			if (!this.resolver.active) return;
 			for (const m of mutations) {
 				for (const n of m.addedNodes) {
-					if (!(n instanceof Element)) continue;
+					if (!n.instanceOf(Element)) continue;
 					if (n.matches(".internal-embed:not([data-external-attachment])")) {
 						void this.tryResolveExternal(n, { sourcePath: "" });
 					}
@@ -50,7 +50,7 @@ export default class ExternalAttachmentsPlugin extends Plugin {
 
 		this.addCommand({
 			id: "rescan-current-view",
-			name: "Rescan current view for external attachments",
+			name: "Rescan current view",
 			callback: () => {
 				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 				view?.previewMode?.rerender(true);
@@ -135,7 +135,7 @@ export default class ExternalAttachmentsPlugin extends Plugin {
 			const observer = new MutationObserver((mutations) => {
 				for (const m of mutations) {
 					for (const n of m.removedNodes) {
-						if (n === embed || (n instanceof Element && n.contains(embed))) {
+						if (n === embed || (n.instanceOf(Element) && n.contains(embed))) {
 							URL.revokeObjectURL(url);
 							this.blobUrls.delete(url);
 							observer.disconnect();

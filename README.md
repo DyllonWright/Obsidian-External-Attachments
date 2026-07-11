@@ -55,7 +55,7 @@ To split attachments across several free cloud services, install each service's 
 
 ## Commands
 
-- **Rescan current view for external attachments** — re-render the active note. Useful right after you move a file externally.
+- **Rescan current view** — re-render the active note. Useful right after you move a file externally.
 - **Rebuild external folder index** — clear the subfolder index so the next lookup rebuilds it. Run this after adding many files to nested folders.
 
 ## Rules of the game

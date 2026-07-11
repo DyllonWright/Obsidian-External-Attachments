@@ -3,3 +3,4 @@ main.js
 *.map
 .DS_Store
 test/.build/
+backup-v0.1.0-original/

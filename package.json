@@ -1,6 +1,6 @@
 {
 	"name": "external-attachments",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Obsidian plugin: resolve attachment embeds from folders outside the vault — offload heavy files to external drives or extra cloud storage while wikilinks keep rendering.",
 	"main": "main.js",
 	"scripts": {
