@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
-import { mountStatus } from "./resolver";
+import { ALIGNMENTS, Alignment, mountStatus } from "./resolver";
 import type ExternalAttachmentsPlugin from "./main";
 
 export interface ExternalAttachmentsSettings {
@@ -9,12 +9,16 @@ export interface ExternalAttachmentsSettings {
 	recursive: boolean;
 	/** Outline embeds that resolved externally. */
 	showIndicator: boolean;
+	/** Where externally-resolved media sits in the note; a |right suffix on an
+	 *  individual wikilink overrides it. */
+	alignment: Alignment;
 }
 
 export const DEFAULT_SETTINGS: ExternalAttachmentsSettings = {
 	mounts: [],
 	recursive: false,
-	showIndicator: true
+	showIndicator: true,
+	alignment: "left"
 };
 
 /**
@@ -37,7 +41,10 @@ export function migrateSettings(raw: Record<string, unknown>): {
 		...data,
 		mounts: Array.isArray(data.mounts)
 			? (data.mounts as unknown[]).filter((m): m is string => typeof m === "string")
-			: []
+			: [],
+		alignment: (ALIGNMENTS as string[]).includes(data.alignment as string)
+			? (data.alignment as Alignment)
+			: DEFAULT_SETTINGS.alignment
 	};
 	return { settings, migrated };
 }
@@ -116,6 +123,26 @@ export class ExternalAttachmentsSettingTab extends PluginSettingTab {
 					this.plugin.settings.recursive = value;
 					await this.plugin.saveSettings();
 				})
+			);
+
+		new Setting(containerEl)
+			.setName("Alignment")
+			.setDesc(
+				"Where externally-resolved media sits in the note. Left matches how " +
+					"Obsidian places ordinary attachments. Override any single embed by " +
+					"adding the word to its wikilink: ![[photo.png|right]] or, with a " +
+					"size, ![[photo.png|400|right]]."
+			)
+			.addDropdown((drop) =>
+				drop
+					.addOption("left", "Left")
+					.addOption("center", "Center")
+					.addOption("right", "Right")
+					.setValue(this.plugin.settings.alignment)
+					.onChange(async (value) => {
+						this.plugin.settings.alignment = value as Alignment;
+						await this.plugin.saveSettings();
+					})
 			);
 
 		new Setting(containerEl)
