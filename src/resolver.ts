@@ -28,6 +28,57 @@ export function linkpathOf(src: string): string {
 	return src.split(/[#|]/)[0].trim();
 }
 
+export interface EmbedSize {
+	width: string;
+	height?: string;
+}
+
+/** A pipe segment reading as WIDTH or WIDTHxHEIGHT, spaces tolerated. */
+const SIZE_RE = /^(\d+)(?:\s*[x×]\s*(\d+))?$/i;
+
+/**
+ * Recover Obsidian's `|WIDTH` / `|WIDTHxHEIGHT` embed sizing.
+ *
+ * Obsidian only splits the size out into its own attribute for embeds it
+ * resolved itself. An embed that stayed unresolved — every embed this plugin
+ * takes over — hands the raw target through instead, so the size still rides
+ * on the link text: `photo.png|400`, `photo.png#page=2|400x300`, sometimes
+ * with spaces the user typed. Read each candidate right to left and take the
+ * last segment that looks like a size, matching Obsidian's own precedence.
+ */
+export function parseEmbedSize(...candidates: (string | null | undefined)[]): EmbedSize | null {
+	for (const raw of candidates) {
+		if (!raw) continue;
+		const parts = raw.split("|");
+		for (let i = parts.length - 1; i >= 0; i--) {
+			const m = parts[i].trim().match(SIZE_RE);
+			if (m) return m[2] ? { width: m[1], height: m[2] } : { width: m[1] };
+		}
+	}
+	return null;
+}
+
+export type Alignment = "left" | "center" | "right";
+
+export const ALIGNMENTS: Alignment[] = ["left", "center", "right"];
+
+/**
+ * Read a per-embed alignment override off the wikilink: `![[photo.png|right]]`
+ * or, alongside a size, `![[photo.png|300|right]]`. Obsidian ignores the extra
+ * segment, so notes carrying one still read fine without this plugin.
+ */
+export function parseEmbedAlign(...candidates: (string | null | undefined)[]): Alignment | null {
+	for (const raw of candidates) {
+		if (!raw) continue;
+		const parts = raw.split("|");
+		for (let i = parts.length - 1; i >= 1; i--) {
+			const word = parts[i].trim().toLowerCase();
+			if ((ALIGNMENTS as string[]).includes(word)) return word as Alignment;
+		}
+	}
+	return null;
+}
+
 export interface ResolverOptions {
 	/** Ordered list of external folders; earlier entries win. */
 	mounts: string[];

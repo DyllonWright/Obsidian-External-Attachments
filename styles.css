@@ -1,3 +1,58 @@
+/* Externally-resolved media behaves like a native embed: never wider than the
+   note it sits in, whatever |WIDTH the wikilink asked for. */
+.internal-embed[data-external-attachment="true"],
+.internal-embed[data-external-attachment="true"] img,
+.internal-embed[data-external-attachment="true"] video,
+.internal-embed[data-external-attachment="true"] audio {
+	max-width: 100%;
+}
+
+/* Only a row of embeds shrink-wraps its containers, so two images written on
+   one line sit side by side the way two ordinary ones would. A lone embed
+   keeps the full-width block Obsidian handed it — in Live Preview that block
+   is the readable-line column itself — and places its media inside. */
+.internal-embed.external-attachment-sized {
+	display: inline-block;
+	line-height: 0;
+	vertical-align: top;
+}
+
+.internal-embed.external-attachment-sized > img,
+.internal-embed.external-attachment-sized > video {
+	display: block;
+}
+
+/* Alignment.
+   The embed's own text-align places its media inside a container that already
+   spans the text column, which keeps the image on the same left and right
+   edges as the prose. A row of embeds shrink-wraps instead, so main.ts aligns
+   the wrapper they share — but only after confirming it holds embeds and no
+   prose, since text-align inherits and would otherwise swing the note's
+   paragraphs around with the picture. */
+.internal-embed[data-external-attachment="true"].external-attachment-align-left {
+	text-align: left;
+}
+
+.internal-embed[data-external-attachment="true"].external-attachment-align-center {
+	text-align: center;
+}
+
+.internal-embed[data-external-attachment="true"].external-attachment-align-right {
+	text-align: right;
+}
+
+.external-attachment-line-left {
+	text-align: left;
+}
+
+.external-attachment-line-center {
+	text-align: center;
+}
+
+.external-attachment-line-right {
+	text-align: right;
+}
+
 /* Subtle dashed outline on embeds that resolved from an external folder. */
 .external-attachment-indicator {
 	outline: 1px dashed rgba(120, 180, 120, 0.4);
