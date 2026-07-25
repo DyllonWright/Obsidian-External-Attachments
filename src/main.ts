@@ -239,24 +239,25 @@ export default class ExternalAttachmentsPlugin extends Plugin {
 
 	/**
 	 * Size the media the way Obsidian sizes its own: width in pixels, height
-	 * free to follow the aspect ratio unless the link named one. Inline styles
-	 * carry it so a theme rule on `.internal-embed img` can't win. The
-	 * container takes the same width — it stays block-level otherwise, and a
-	 * 300 px image would sit inside a full-width box, stretching the indicator
-	 * outline right across the note.
+	 * free to follow the aspect ratio unless the link named one. The values
+	 * come from the wikilink, so no stylesheet can hold them — `setCssStyles`
+	 * applies them per element, which also outranks a theme rule on
+	 * `.internal-embed img`. The container takes the same width; it stays
+	 * block-level otherwise, and a 300 px image would sit inside a full-width
+	 * box, stretching the indicator outline across the note.
 	 */
 	private applySize(mediaEl: HTMLElement, size: EmbedSize | null, shrink: HTMLElement | null): void {
 		if (!size) return;
 
 		mediaEl.setAttribute("width", size.width);
-		mediaEl.style.width = `${size.width}px`;
 		if (size.height) {
 			mediaEl.setAttribute("height", size.height);
-			mediaEl.style.height = `${size.height}px`;
-		} else if (mediaEl.tagName !== "IFRAME") {
-			// A PDF frame keeps its own viewport height; everything else follows
-			// its aspect ratio.
-			mediaEl.style.height = "auto";
+			mediaEl.setCssStyles({ width: `${size.width}px`, height: `${size.height}px` });
+		} else if (mediaEl.tagName === "IFRAME") {
+			// A PDF frame keeps its own viewport height.
+			mediaEl.setCssStyles({ width: `${size.width}px` });
+		} else {
+			mediaEl.setCssStyles({ width: `${size.width}px`, height: "auto" });
 		}
 
 		// Only a container in a row shrink-wraps. A lone embed keeps the width
@@ -265,7 +266,7 @@ export default class ExternalAttachmentsPlugin extends Plugin {
 		if (!shrink) return;
 		shrink.setAttribute("width", size.width);
 		if (size.height) shrink.setAttribute("height", size.height);
-		shrink.style.width = `${size.width}px`;
+		shrink.setCssStyles({ width: `${size.width}px` });
 		shrink.addClass("external-attachment-sized");
 	}
 
@@ -284,12 +285,15 @@ export default class ExternalAttachmentsPlugin extends Plugin {
 	 * containers need their shared wrapper aligned instead.
 	 */
 	private applyAlign(embed: HTMLElement, align: Alignment, line: HTMLElement | null): void {
+		// The class carries the alignment for anyone styling against it; the
+		// per-element style makes it stick even under a theme that aligns
+		// `.internal-embed` itself.
 		embed.addClass(`external-attachment-align-${align}`);
-		embed.style.textAlign = align;
+		embed.setCssStyles({ textAlign: align });
 
 		if (!line || !holdsEmbedsOnly(line)) return;
 		for (const a of ALIGNMENTS) line.removeClass(`external-attachment-line-${a}`);
 		line.addClass(`external-attachment-line-${align}`);
-		line.style.textAlign = align;
+		line.setCssStyles({ textAlign: align });
 	}
 }
